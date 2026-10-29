@@ -777,6 +777,13 @@ func (s *Server) onPostDescriptor(peerID string, cmd *commands.PostDescriptor, p
 	}
 	s.log.Debugf("onPostDescriptor: SignedUpload signature verification passed for node %s from peer %s", strconv.QuoteToASCII(desc.Name), strconv.QuoteToASCII(peerID))
 
+	if signedUpload.LoopStats != nil {
+		s.log.Noticef("onPostDescriptor: node %s uploaded LoopStats for epoch %d with %d segments",
+			desc.Name, signedUpload.LoopStats.Epoch, len(signedUpload.LoopStats.SegmentRatios))
+	} else {
+		s.log.Noticef("onPostDescriptor: node %s uploaded NO LoopStats", desc.Name)
+	}
+
 	if !hmac.Equal(desc.LinkKey, sessionLinkKey) {
 		s.log.Errorf("Peer %s: descriptor link key is not the session link key", strconv.QuoteToASCII(peerID))
 		instrument.DescriptorRejected("mix", "link_key_mismatch")
